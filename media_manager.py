@@ -9,7 +9,7 @@ cursor = conn.cursor()
 # books database
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS books (
-    if INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
     author TEXT NOT NULL,
     genre TEXT NOT NULL
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS books (
 # dvd database
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS dvds (
-    if INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
     director TEXT NOT NULL,
     genre TEXT NOT NULL
@@ -41,7 +41,7 @@ def openBookList():
     addButton.pack(side=tk.RIGHT, padx=5)
 
     sortVar = tk.StringVar(value="Sort")
-    sortMenu = ttk.OptionMenu(header, sortVar, "Sort", "Title", "Author", "Genre", command=lambda x: showBookTable(bookTree, x))
+    sortMenu = ttk.OptionMenu(header, sortVar, "Sort", "Title", "Author", "Genre", command=lambda x: displayBoooks(bookTree, x))
     sortMenu.pack(side=tk.RIGHT)
 
     # table of books
@@ -54,7 +54,7 @@ def openBookList():
     bookTree.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
 
     # displays window when opened
-    showBookTable(bookTree)
+    displayBoooks(bookTree)
 
 def openAddBook(parentWindow):
     addWindow = tk.Toplevel(parentWindow)
@@ -85,13 +85,12 @@ def openAddBook(parentWindow):
             conn.commit()
             messagebox.showinfo("Success", "Book added")
             addWindow.destroy()
-            showBookTable(bookTree)
+            displayBoooks(bookTree)
         
     tk.Button(addWindow, text="Add", command=addBook).grid(row=3, column=0, pady=5)
     tk.Button(addWindow, text="Close", command=addWindow.destroy).grid(row=3, column=1, pady=5)
 
-
-def showBookTable(tree, sort_by=None):
+def displayBoooks(tree, sort_by=None):
     # clear existing table
     for row in tree.get_children():
         tree.delete(row)
@@ -169,7 +168,6 @@ def openAddDVD(parentWindow):
         
     tk.Button(addWindow, text="Add", command=addDVD).grid(row=3, column=0, pady=5)
     tk.Button(addWindow, text="Close", command=addWindow.destroy).grid(row=3, column=1, pady=5)
-
 
 def showDVDTable(tree, sort_by=None):
     # clear existing table
