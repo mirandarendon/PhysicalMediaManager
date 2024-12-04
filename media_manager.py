@@ -27,7 +27,7 @@ def openBookList():
 
     tk.Label(header, text="Books", font=("Arial", 16)).pack(side=tk.LEFT)
     
-    addButton = tk.Button(header, text="Add", command=lambda: openBookList(bookWindow))
+    addButton = tk.Button(header, text="Add", command=lambda: openAddBook(bookWindow))
     addButton.pack(side=tk.RIGHT, padx=5)
 
     sortVar = tk.StringVar(value="Sort")
@@ -37,7 +37,7 @@ def openBookList():
     # table of books
     columns = ("Title", "Author", "Genre")
     global tree
-    tree = ttk.Treeview(bookWindow, columns=columns, show="heading")
+    tree = ttk.Treeview(bookWindow, columns=columns, show="headings")
     tree.heading("Title", text="Title")
     tree.heading("Author", text="Author")
     tree.heading("Genre", text="Genre")
@@ -47,10 +47,39 @@ def openBookList():
     showTable(tree)
 
 def openAddBook(parentWindow):
-    pass
+    addWindow = tk.Toplevel(parentWindow)
+    addWindow.title("Add Book")
 
+    # input boxes
+    tk.Label(addWindow, text="Title:").grid(row=0, column=0, padx=5, pady=5)
+    titleEntry = tk.Entry(addWindow)
+    titleEntry.grid(row=0, column=1)
+    
+    tk.Label(addWindow, text="Author:").grid(row=1, column=0, padx=5, pady=5)
+    authorEntry = tk.Entry(addWindow)
+    authorEntry.grid(row=1, column=1)
+    
+    tk.Label(addWindow, text="Genre:").grid(row=2, column=0, padx=5, pady=5)
+    genreEntry = tk.Entry(addWindow)
+    genreEntry.grid(row=2, column=1)
+    
     def addBook():
-        pass
+        title = titleEntry.get().strip().title()
+        author = authorEntry.get().strip().title()
+        genre = genreEntry.get().strip().title()
+
+        if not title or not author or not genre:
+            messagebox.showerror("Error", "Fill out all fields")
+        else:
+            cursor.execute('INSERT INTO books (title, author, genre) VALUES (?, ?, ?)', (title, author, genre))
+            conn.commit()
+            messagebox.showinfo("Success", "Book added")
+            addWindow.destroy()
+            showTable(tree)
+        
+    tk.Button(addWindow, text="Add", command=addBook).grid(row=3, column=0, pady=5)
+    tk.Button(addWindow, text="Close", command=addBook.destroy).grid(row=3, column=1, pady=5)
+
 
 def showTable(tree, sort_by=None):
     # clear existing table
@@ -73,6 +102,9 @@ root.title("Physical Media Manager")
 
 welcomeLabel = tk.Label(root, text="Welcome to your Physical Media Manager!")
 welcomeLabel.pack(pady=10)
+
+bookButton = tk.Button(root, text="Book", command=openBookList)
+bookButton.pack(pady=10)
 
 root.mainloop()
 
