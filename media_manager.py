@@ -31,20 +31,20 @@ def openBookList():
     addButton.pack(side=tk.RIGHT, padx=5)
 
     sortVar = tk.StringVar(value="Sort")
-    sortMenu = ttk.OptionMenu(header, sortVar, "Sort", "Title", "Author", "Genre", command=lambda x: showTable(tree, x))
+    sortMenu = ttk.OptionMenu(header, sortVar, "Sort", "Title", "Author", "Genre", command=lambda x: showTable(bookTree, x))
     sortMenu.pack(side=tk.RIGHT)
 
     # table of books
     columns = ("Title", "Author", "Genre")
-    global tree
-    tree = ttk.Treeview(bookWindow, columns=columns, show="headings")
-    tree.heading("Title", text="Title")
-    tree.heading("Author", text="Author")
-    tree.heading("Genre", text="Genre")
-    tree.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
+    global bookTree
+    bookTree = ttk.Treeview(bookWindow, columns=columns, show="headings")
+    bookTree.heading("Title", text="Title")
+    bookTree.heading("Author", text="Author")
+    bookTree.heading("Genre", text="Genre")
+    bookTree.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
 
     # displays window when opened
-    showTable(tree)
+    showTable(bookTree)
 
 def openAddBook(parentWindow):
     addWindow = tk.Toplevel(parentWindow)
@@ -75,10 +75,10 @@ def openAddBook(parentWindow):
             conn.commit()
             messagebox.showinfo("Success", "Book added")
             addWindow.destroy()
-            showTable(tree)
+            showTable(bookTree)
         
     tk.Button(addWindow, text="Add", command=addBook).grid(row=3, column=0, pady=5)
-    tk.Button(addWindow, text="Close", command=addBook.destroy).grid(row=3, column=1, pady=5)
+    tk.Button(addWindow, text="Close", command=addWindow.destroy).grid(row=3, column=1, pady=5)
 
 
 def showTable(tree, sort_by=None):
@@ -97,6 +97,14 @@ def showTable(tree, sort_by=None):
     for row in rows:
         tree.insert("", tk.END, values=row)
 
+def openDVDList():
+    pass
+
+def openAddDVD(parentWindow):
+    pass
+    def addDVD():
+        pass
+
 root = tk.Tk()
 root.title("Physical Media Manager")
 
@@ -105,6 +113,9 @@ welcomeLabel.pack(pady=10)
 
 bookButton = tk.Button(root, text="Book", command=openBookList)
 bookButton.pack(pady=10)
+
+dvdButton = tk.Button(root, text="DVD", command=openDVDList)
+dvdButton.pack(pady=10)
 
 root.mainloop()
 
