@@ -6,7 +6,17 @@ import sqlite3
 conn = sqlite3.connect('books.db')
 cursor = conn.cursor()
 
-# create table if it doesnt exist
+# books database
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS books (
+    if INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    author TEXT NOT NULL,
+    genre TEXT NOT NULL
+)
+''')
+
+# dvd database
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS books (
     if INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -31,7 +41,7 @@ def openBookList():
     addButton.pack(side=tk.RIGHT, padx=5)
 
     sortVar = tk.StringVar(value="Sort")
-    sortMenu = ttk.OptionMenu(header, sortVar, "Sort", "Title", "Author", "Genre", command=lambda x: showTable(bookTree, x))
+    sortMenu = ttk.OptionMenu(header, sortVar, "Sort", "Title", "Author", "Genre", command=lambda x: showBookTable(bookTree, x))
     sortMenu.pack(side=tk.RIGHT)
 
     # table of books
@@ -44,7 +54,7 @@ def openBookList():
     bookTree.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
 
     # displays window when opened
-    showTable(bookTree)
+    showBookTable(bookTree)
 
 def openAddBook(parentWindow):
     addWindow = tk.Toplevel(parentWindow)
@@ -81,7 +91,7 @@ def openAddBook(parentWindow):
     tk.Button(addWindow, text="Close", command=addWindow.destroy).grid(row=3, column=1, pady=5)
 
 
-def showTable(tree, sort_by=None):
+def showBookTable(tree, sort_by=None):
     # clear existing table
     for row in tree.get_children():
         tree.delete(row)
@@ -98,12 +108,54 @@ def showTable(tree, sort_by=None):
         tree.insert("", tk.END, values=row)
 
 def openDVDList():
-    pass
+    dvdWindow = tk.Toplevel(root)
+    dvdWindow.title("DVDs")
+
+    # header bar
+    header = tk.Frame(dvdWindow)
+    header.pack(fill=tk.X, padx=10, pady=5)
+
+    tk.Label(header, text="DVDs", font=("Arial", 16)).pack(side=tk.LEFT)
+    
+    addButton = tk.Button(header, text="Add", command=lambda: openAddDVD(dvdWindow))
+    addButton.pack(side=tk.RIGHT, padx=5)
+
+    sortVar = tk.StringVar(value="Sort")
+    sortMenu = ttk.OptionMenu(header, sortVar, "Sort", "Title", "Director", "Genre", command=lambda x: showDVDTable(dvdTree, x))
+    sortMenu.pack(side=tk.RIGHT)
+
+    # table of books
+    columns = ("Title", "Director", "Genre")
+    global dvdTree
+    dvdTree = ttk.Treeview(dvdWindow, columns=columns, show="headings")
+    dvdTree.heading("Title", text="Title")
+    dvdTree.heading("Director", text="Director")
+    dvdTree.heading("Genre", text="Genre")
+    dvdTree.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
+
+    # displays window when opened
+    showDVDTable(dvdTree)
 
 def openAddDVD(parentWindow):
     pass
     def addDVD():
         pass
+
+def showDVDTable(tree, sort_by=None):
+    # clear existing table
+    for row in tree.get_children():
+        tree.delete(row)
+    
+    # get sorted data from DB
+    if sort_by:
+        query = f'SELECT title, director, genre FROM dvds ORDER BY {sort_by.lower()}'
+    else:
+        query = 'SELECT title, director, genre FROM dvds'
+    cursor.execute(query)
+    rows = cursor.fetchall()
+    
+    for row in rows:
+        tree.insert("", tk.END, values=row)
 
 root = tk.Tk()
 root.title("Physical Media Manager")
