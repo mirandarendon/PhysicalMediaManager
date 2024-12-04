@@ -3,7 +3,7 @@ from tkinter import messagebox, ttk
 import sqlite3
 
 # connect to SQLite
-conn = sqlite3.connect('books.db')
+conn = sqlite3.connect('media.db')
 cursor = conn.cursor()
 
 # books database
@@ -18,10 +18,10 @@ CREATE TABLE IF NOT EXISTS books (
 
 # dvd database
 cursor.execute('''
-CREATE TABLE IF NOT EXISTS books (
+CREATE TABLE IF NOT EXISTS dvds (
     if INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
-    author TEXT NOT NULL,
+    director TEXT NOT NULL,
     genre TEXT NOT NULL
 )
 ''')
@@ -85,7 +85,7 @@ def openAddBook(parentWindow):
             conn.commit()
             messagebox.showinfo("Success", "Book added")
             addWindow.destroy()
-            showTable(bookTree)
+            showBookTable(bookTree)
         
     tk.Button(addWindow, text="Add", command=addBook).grid(row=3, column=0, pady=5)
     tk.Button(addWindow, text="Close", command=addWindow.destroy).grid(row=3, column=1, pady=5)
@@ -137,9 +137,39 @@ def openDVDList():
     showDVDTable(dvdTree)
 
 def openAddDVD(parentWindow):
-    pass
+    addWindow = tk.Toplevel(parentWindow)
+    addWindow.title("Add DVD")
+
+    # input boxes
+    tk.Label(addWindow, text="Title:").grid(row=0, column=0, padx=5, pady=5)
+    titleEntry = tk.Entry(addWindow)
+    titleEntry.grid(row=0, column=1)
+    
+    tk.Label(addWindow, text="Director:").grid(row=1, column=0, padx=5, pady=5)
+    directorEntry = tk.Entry(addWindow)
+    directorEntry.grid(row=1, column=1)
+    
+    tk.Label(addWindow, text="Genre:").grid(row=2, column=0, padx=5, pady=5)
+    genreEntry = tk.Entry(addWindow)
+    genreEntry.grid(row=2, column=1)
+    
     def addDVD():
-        pass
+        title = titleEntry.get().strip().title()
+        director = directorEntry.get().strip().title()
+        genre = genreEntry.get().strip().title()
+
+        if not title or not director or not genre:
+            messagebox.showerror("Error", "Fill out all fields")
+        else:
+            cursor.execute('INSERT INTO dvds (title, director, genre) VALUES (?, ?, ?)', (title, director, genre))
+            conn.commit()
+            messagebox.showinfo("Success", "DVD added")
+            addWindow.destroy()
+            showDVDTable(dvdTree)
+        
+    tk.Button(addWindow, text="Add", command=addDVD).grid(row=3, column=0, pady=5)
+    tk.Button(addWindow, text="Close", command=addWindow.destroy).grid(row=3, column=1, pady=5)
+
 
 def showDVDTable(tree, sort_by=None):
     # clear existing table
