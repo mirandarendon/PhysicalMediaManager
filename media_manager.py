@@ -18,16 +18,55 @@ CREATE TABLE IF NOT EXISTS books (
 conn.commit()
 
 def openBookList():
-    pass
+    bookWindow = tk.Toplevel(root)
+    bookWindow.title("Books")
 
-def openAddBook(parentWin):
+    # header bar
+    header = tk.Frame(bookWindow)
+    header.pack(fill=tk.X, padx=10, pady=5)
+
+    tk.Label(header, text="Books", font=("Arial", 16)).pack(side=tk.LEFT)
+    
+    addButton = tk.Button(header, text="Add", command=lambda: openBookList(bookWindow))
+    addButton.pack(side=tk.RIGHT, padx=5)
+
+    sortVar = tk.StringVar(value="Sort")
+    sortMenu = ttk.OptionMenu(header, sortVar, "Sort", "Title", "Author", "Genre", command=lambda x: showTable(tree, x))
+    sortMenu.pack(side=tk.RIGHT)
+
+    # table of books
+    columns = ("Title", "Author", "Genre")
+    global tree
+    tree = ttk.Treeview(bookWindow, columns=columns, show="heading")
+    tree.heading("Title", text="Title")
+    tree.heading("Author", text="Author")
+    tree.heading("Genre", text="Genre")
+    tree.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
+
+    # displays window when opened
+    showTable(tree)
+
+def openAddBook(parentWindow):
     pass
 
     def addBook():
         pass
 
-def showTable():
-    pass
+def showTable(tree, sort_by=None):
+    # clear existing table
+    for row in tree.get_children():
+        tree.delete(row)
+    
+    # get sorted data from DB
+    if sort_by:
+        query = f'SELECT title, author, genre FROM books ORDER BY {sort_by.lower()}'
+    else:
+        query = 'SELECT title, author, genre FROM books'
+    cursor.execute(query)
+    rows = cursor.fetchall()
+    
+    for row in rows:
+        tree.insert("", tk.END, values=row)
 
 root = tk.Tk()
 root.title("Physical Media Manager")
